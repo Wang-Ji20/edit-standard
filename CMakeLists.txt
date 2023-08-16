@@ -33,16 +33,13 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wno-unused-parameter -Wno-a
 # emit compiler settings.
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-# if define ASAN, use address sanitizer
-if(SANITIZER STREQUAL "ASAN")
-    message(STATUS "Using ASAN")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-endif()
-
 # if define TSAN, use thread sanitizer
 if(SANITIZER STREQUAL "TSAN")
     message(STATUS "Using TSAN")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
+else ()
+    message(STATUS "Using ASAN")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 endif()
 
 # include
@@ -51,7 +48,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(EDITSTD_SRC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
-set(EDITSTD_THIRD_PARTY_INCLUDE_DIRECTORIES)
+set(EDITSTD_THIRD_PARTY_INCLUDE_DIRECTORIES ${PROJECT_SOURCE_DIR}/third_party/otio/src)
 
 include_directories(${EDITSTD_SRC_INCLUDE_DIR} ${EDITSTD_THIRD_PARTY_INCLUDE_DIRECTORIES})
 
