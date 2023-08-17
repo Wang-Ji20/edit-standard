@@ -4,3 +4,6 @@
 [submodule "third_party/otio"]
 	path = third_party/otio
 	url = https://github.com/Wang-Ji20/OpenTimelineIO.git
+[submodule "third_party/yyjson"]
+	path = third_party/yyjson
+	url = https://github.com/ibireme/yyjson.git

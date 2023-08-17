@@ -157,6 +157,9 @@ public:
     ValidateTrack();
     ValidateStack();
     stack->append_child(clip);
+    const otio::TimeRange range(otio::RationalTime(0, 24),
+                                otio::RationalTime(24, 24));
+    clip->set_source_range(range);
   }
 
   void ValidateComposite() {

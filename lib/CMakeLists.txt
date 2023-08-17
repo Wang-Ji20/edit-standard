@@ -1,3 +1,5 @@
+add_subdirectory(serializer)
+
 set(
     ALL_OBJECT_FILES
     ${ALL_OBJECT_FILES}
@@ -13,6 +15,7 @@ add_library(
 set(
     THIRD_PARTY_DEPENDENCIES
     opentimelineio
+    yyjson
 )
 
 target_link_libraries(

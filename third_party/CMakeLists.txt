@@ -1,10 +1,11 @@
 add_subdirectory(googletest)
 add_subdirectory(otio)
+add_subdirectory(yyjson)
 
 # third part, not my business
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
-set(DEPS_SUBMODULES googletest otio)
+set(DEPS_SUBMODULES googletest otio yyjson)
 
 foreach(submodule IN LISTS DEPS_SUBMODULES)
     file(GLOB SUBMOD_CONTENTS ${submodule})

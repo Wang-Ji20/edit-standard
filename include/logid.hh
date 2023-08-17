@@ -7,15 +7,27 @@
 //
 //===------------------------------------------===
 
-#ifndef ESTD_UUID_HH
-#define ESTD_UUID_HH
+#ifndef ESTD_LOGID_HH
+#define ESTD_LOGID_HH
 
 #include <array>
 #include <ctime>
 
 namespace estd {
 
-using LogID = std::array<char, 16>;
+struct LogID {
+  auto data() -> uint8_t * { return id_.data(); }
+  template <typename Ser>
+  friend void estdWriteValue(Ser &serializer, const LogID &value) {
+    serializer.OnVectorBegin(16);
+    for (auto c : value.id_) {
+      serializer.WriteValue(c);
+    }
+    serializer.OnVectorEnd(16);
+  }
+
+  std::array<uint8_t, 16> id_;
+};
 
 class LogIDGenerator {
 public:
@@ -38,4 +50,4 @@ private:
 
 } // namespace estd
 
-#endif
+#endif // ESTD_LOGID_HH

@@ -18,9 +18,14 @@ namespace estd {
 
 namespace otio = opentimelineio::OPENTIMELINEIO_VERSION;
 
-struct ObjLocation {
+struct OtioLocation {
   // use $[trackName][][][].property to refer an OTIO object
   std::string rawLocation;
+
+  template <typename Ser>
+  friend void estdWriteValue(Ser &serializer, const OtioLocation &value) {
+    serializer.WriteValue(value.rawLocation);
+  }
 };
 
 enum class LogType: uint8_t {
@@ -33,9 +38,19 @@ enum class LogType: uint8_t {
 
 struct LogRecord {
   LogID id;
-  ObjLocation location;
+  OtioLocation location;
   LogType type;
-  std::vector<char> data;
+  std::vector<uint8_t> data;
+
+  template <typename Ser>
+  friend void estdWriteValue(Ser &serializer, const LogRecord &value) {
+    serializer.OnObjectBegin();
+    serializer.WriteProperty("id", value.id);
+    serializer.WriteProperty("location", value.location);
+    serializer.WriteProperty("type", value.type);
+    serializer.WriteProperty("data", value.data);
+    serializer.OnObjectEnd();
+  }
 };
 
 } // namespace estd
