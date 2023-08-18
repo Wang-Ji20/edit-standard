@@ -33,6 +33,9 @@ public:
               std::vector<uint8_t> &data) {
     LogID id(seed_, counter_++);
     LogRecord record{id, location, type, data};
+    // TODO: Refactor, only object can be accepted.
+    // there is a workaround for test case now.
+    location.object ? location.object->Accept(record) : (void)0;
     writer_.Write(record);
   }
 

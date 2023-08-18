@@ -4,6 +4,7 @@ set(
     ALL_OBJECT_FILES
     ${ALL_OBJECT_FILES}
     log_record.cc
+    respository.cc
 )
 
 add_library(

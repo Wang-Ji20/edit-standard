@@ -34,6 +34,8 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
+#include <unordered_map>
 
 #include <set>
 
@@ -92,7 +94,6 @@ public:
     }
   }
 
-
   /// write properties
   /// syntax sugar for "key" : "value"
   template <typename T> void WriteProperty(const char *key, const T &value) {
@@ -105,9 +106,9 @@ public:
     }
   }
 
-//===------------------------------------------------------------------------===
-// These part is used by Data records types mainly.
-//===------------------------------------------------------------------------===
+  //===------------------------------------------------------------------------===
+  // These part is used by Data records types mainly.
+  //===------------------------------------------------------------------------===
 
   virtual void OnObjectBegin() {}
   virtual void OnObjectEnd() {}

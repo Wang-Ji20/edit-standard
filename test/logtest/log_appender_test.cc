@@ -24,7 +24,7 @@ TEST(LogAppenderSuite, AppendTest) {
   LogAppender appender(writer);
 
   vector<uint8_t> data{1, 2, 3, 4, 5};
-  OtioLocation location{"$[root][][][].property"};
+  OtioLocation location{"$", OTIOType::kTimeline};
   appender.Append(LogType::kCreate, location, data);
   appender.Append(LogType::kModify, location, data);
 }

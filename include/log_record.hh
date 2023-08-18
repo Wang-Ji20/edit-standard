@@ -17,6 +17,7 @@
 #define ESTD_LOG_RECORD_HH
 
 #include "memory.hh"
+#include "model/abstract_model.hh"
 
 #include "opentimelineio/serializableObject.h"
 #include <string>
@@ -38,9 +39,14 @@ enum class OTIOType : uint8_t {
 };
 
 struct OtioLocation {
-  OtioLocation(std::string rawLocation) {
+  OtioLocation(std::string rawLocation, OTIOType objectTy, AbstractModel *aobject = nullptr)
+      : objectTy(objectTy), object(aobject) {
     Validate(rawLocation);
     this->rawLocation = std::move(rawLocation);
+  }
+
+  auto operator== (const OtioLocation &other) const -> bool {
+    return rawLocation == other.rawLocation;
   }
 
   static void Validate(const std::string &rawLocation) {
@@ -61,6 +67,7 @@ struct OtioLocation {
   // use $[trackName][][][].property to refer an OTIO object
   std::string rawLocation;
   OTIOType objectTy;
+  AbstractModel *object; // TODO: change to reference
 };
 
 enum class LogType : uint8_t {
