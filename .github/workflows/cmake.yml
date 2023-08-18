@@ -1,0 +1,38 @@
+name: CMake Build Matrix
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        cxx: [clang++]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Checkout Submodules
+        working-directory: ${{github.workspace}}
+        run: git submodule update --init --recursive
+      - name: Configure CMake
+        run: CXX=${{matrix.cxx}} cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: make check-tests
+      - name: prepare ASAN
+        run: CXX=${{matrix.cxx}} cmake -B ${{github.workspace}}/asan-build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSANITIZER=ASAN
+      - name: Test ASAN
+        working-directory: ${{github.workspace}}/asan-build
+        run: make check-tests
+      - name: prepare TSAN
+        run: CXX=${{matrix.cxx}} cmake -B ${{github.workspace}}/tsan-build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSANITIZER=TSAN
+      - name: Test TSAN
+        working-directory: ${{github.workspace}}/tsan-build
+        run: make check-tests

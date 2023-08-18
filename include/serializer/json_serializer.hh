@@ -22,58 +22,47 @@ class JsonSerializer : public Serializer {
   // public interface
   //===------------------------------------------------===
 public:
-  auto GetRoot() -> yyjson_mut_val * {
-    return stack.front();
+  explicit JsonSerializer(yyjson_mut_doc *doc = yyjson_mut_doc_new(nullptr),
+                          bool pretty = true, bool skipNull = false,
+                          bool skipEmpty = false)
+      : doc(doc), stack{yyjson_mut_arr(doc)}, skipEmpty_(skipEmpty),
+        pretty_(pretty) {
+    yyjson_mut_doc_set_root(doc, GetCurrent());
   }
 
-  template <typename T>
-  static auto Serialize(const T &value,
-                        yyjson_mut_doc *doc,
-                        bool pretty = true,
-                        bool skipNull = false,
-                        bool skipEmpty = false) -> yyjson_mut_val * {
-    JsonSerializer serializer(doc, pretty, skipNull, skipEmpty);
-    serializer.WriteValue(value);
-    return serializer.GetRoot();
-  }
-
-  template <typename T>
-  static auto ToString(const T &value,
-                       bool pretty = true,
-                       bool skipNull = false,
-                       bool skipEmpty = false) -> std::string {
-    auto *doc = yyjson_mut_doc_new(nullptr);
-    Serialize(value, doc, pretty, skipNull, skipEmpty);
+  auto Serialize() -> std::vector<uint8_t> override {
     auto *str =
-        yyjson_mut_write(doc, pretty ? YYJSON_WRITE_PRETTY : 0, nullptr);
-    auto result = std::string(str);
+        yyjson_mut_write(doc, pretty_ ? YYJSON_WRITE_PRETTY : 0, nullptr);
+    auto result = std::vector<uint8_t>(str, str + strlen(str));
     free(str);
-    yyjson_mut_doc_free(doc);
     return result;
   }
+
+  auto Clear() -> void override {
+    yyjson_mut_doc_free(doc);
+    buffer_.clear();
+    stack.clear();
+    doc = yyjson_mut_doc_new(nullptr);
+    stack.push_back(yyjson_mut_arr(doc));
+    yyjson_mut_doc_set_root(doc, GetCurrent());
+  }
+
+  ~JsonSerializer() override { yyjson_mut_doc_free(doc); }
 
   //===------------------------------------------------===
   // Internals
   //===------------------------------------------------===
 
 private:
-  explicit JsonSerializer(yyjson_mut_doc *doc,
-                          bool pretty = true,
-                          bool skipNull = false,
-                          bool skipEmpty = false)
-      : doc(doc),
-        stack{yyjson_mut_arr(doc)},
-        skipEmpty_(skipEmpty) {
-    yyjson_mut_doc_set_root(doc, GetCurrent());
-  }
-
   yyjson_mut_doc *doc;
   yyjson_mut_val *current_tag;
+
   std::vector<yyjson_mut_val *> stack;
+  auto GetRoot() -> yyjson_mut_val * { return stack.front(); }
+  inline auto GetCurrent() -> yyjson_mut_val * { return stack.back(); }
 
   bool skipEmpty_ = false;
-
-  inline auto GetCurrent() -> yyjson_mut_val * { return stack.back(); }
+  bool pretty_ = true;
 
   void PushValue(yyjson_mut_val *val);
   void PruneEmptyObject(yyjson_mut_val *obj);
@@ -127,6 +116,9 @@ public:
   void WriteValue(int64_t value) final;
   void WriteValue(float value) final;
   void WriteValue(double value) final;
+
+private:
+  std::vector<uint8_t> buffer_;
 };
 
 } // namespace estd

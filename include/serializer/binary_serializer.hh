@@ -25,6 +25,17 @@ using std::vector;
 ///    1. The first 4 bytes is the container size
 ///    2. The next are elements in the container
 class BinarySerializer : public Serializer {
+public:
+  auto Serialize() -> std::vector<uint8_t> override {
+    return {data.begin(), data.end()};
+  }
+  
+  void Clear() override {
+    data.clear();
+    stack.clear();
+    stack.emplace_back(0, 0, 0);
+  }
+
 private:
   //===------------------------------------------------------------------------===
   // Internal Implementation

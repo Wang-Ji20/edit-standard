@@ -15,6 +15,18 @@
 // Such thing is left to the concrete serializer, and
 // caller should aware what type of serializer is used in
 // storage module.
+//
+// Responsibility:
+//  - serialize data into a byte stream
+//
+// Serializer state machine:
+//  1 empty
+//  2 serialized something
+//
+//  1 -> 2 call Write related func
+//  2 -> 2 call Write related func
+//  2 -> 1 call Clear()
+//
 //===------------------------------------------------===
 
 #pragma once
@@ -30,26 +42,14 @@ using std::string;
 using std::unique_ptr;
 
 class Serializer {
-  friend struct Writer;
+  friend class Writer;
 
 public:
+  virtual auto Serialize() -> std::vector<uint8_t> = 0;
+  virtual void Clear() = 0;
+
   virtual void SetTag(const char *tag) = 0;
-
-  /// write properties
-  /// syntax sugar for "key" : "value"
-  template <typename T> void WriteProperty(const char *key, const T &value) {
-    SetTag(key);
-    if constexpr (!std::is_enum_v<T>) {
-      WriteValue(value);
-      return;
-    } else {
-      WriteValue(static_cast<typename std::underlying_type<T>::type>(value));
-    }
-  }
-
-  virtual void OnObjectBegin() {}
-  virtual void OnObjectEnd() {}
-
+  virtual ~Serializer() = default;
   /// write a generic value
   // Friend Template Argument-Dependent Lookup Extension
   //
@@ -91,6 +91,26 @@ public:
       WriteValue(*ptr);
     }
   }
+
+
+  /// write properties
+  /// syntax sugar for "key" : "value"
+  template <typename T> void WriteProperty(const char *key, const T &value) {
+    SetTag(key);
+    if constexpr (!std::is_enum_v<T>) {
+      WriteValue(value);
+      return;
+    } else {
+      WriteValue(static_cast<typename std::underlying_type<T>::type>(value));
+    }
+  }
+
+//===------------------------------------------------------------------------===
+// These part is used by Data records types mainly.
+//===------------------------------------------------------------------------===
+
+  virtual void OnObjectBegin() {}
+  virtual void OnObjectEnd() {}
 
   //===------------------------------------------------===
   // write a pair

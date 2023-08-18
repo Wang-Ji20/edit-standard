@@ -1,3 +1,19 @@
 persistent editorial history
 
-Test Driven Development
+code convention:
+
+- test driven development
+
+- use struct for data structures, use class for objects. they are different.
+
+- short function, less params, do NOT use out params.
+
+- small classes
+
+- only inherit interfaces, program to interfaces
+
+- use exceptions, static, constexpr, const, assert liberally
+
+- .cc for c++ source, .hh for c++ header, .h for C & C++ compatible header, .c for c source
+
+- others are enforced by .clangd & .editorconfig
