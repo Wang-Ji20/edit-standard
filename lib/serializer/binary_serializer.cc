@@ -11,7 +11,8 @@
 
 namespace estd {
 
-void BinarySerializer::SetTag(const char *tag) {
+void
+BinarySerializer::SetTag(const char *tag) {
   current_tag = tag;
   stack.back().fieldCount++;
 }
@@ -20,17 +21,25 @@ void BinarySerializer::SetTag(const char *tag) {
 // complex types
 //===------------------------------------------------------------------------===
 
-void BinarySerializer::OnVectorBegin(size_t size) { Write<size_t>(size); }
+void
+BinarySerializer::OnVectorBegin(size_t size) {
+  Write<size_t>(size);
+}
 
-void BinarySerializer::OnUnorderedMapBegin(size_t size) { Write<size_t>(size); }
+void
+BinarySerializer::OnUnorderedMapBegin(size_t size) {
+  Write<size_t>(size);
+}
 
-void BinarySerializer::OnObjectBegin() {
+void
+BinarySerializer::OnObjectBegin() {
   stack.emplace_back(0, 0ULL, data.size());
   Write<uint32_t>(0);  // Placeholder for the field count
   Write<size_t>(0ULL); // Placeholder for the size
 }
 
-void BinarySerializer::OnObjectEnd() {
+void
+BinarySerializer::OnObjectEnd() {
   auto &frame = stack.back();
   // Patch the field count and size
   auto *message_start = &data[frame.bufferOffset];
@@ -43,31 +52,66 @@ void BinarySerializer::OnObjectEnd() {
 // primitive types
 //===------------------------------------------------------------------------===
 
-void BinarySerializer::WriteNull() {}
+void
+BinarySerializer::WriteNull() {}
 
-void BinarySerializer::WriteValue(bool value) { Write<bool>(value); }
+void
+BinarySerializer::WriteValue(bool value) {
+  Write<bool>(value);
+}
 
-void BinarySerializer::WriteValue(uint8_t value) { Write<uint8_t>(value); }
+void
+BinarySerializer::WriteValue(uint8_t value) {
+  Write<uint8_t>(value);
+}
 
-void BinarySerializer::WriteValue(uint16_t value) { Write<uint16_t>(value); }
+void
+BinarySerializer::WriteValue(uint16_t value) {
+  Write<uint16_t>(value);
+}
 
-void BinarySerializer::WriteValue(uint32_t value) { Write<uint32_t>(value); }
+void
+BinarySerializer::WriteValue(uint32_t value) {
+  Write<uint32_t>(value);
+}
 
-void BinarySerializer::WriteValue(uint64_t value) { Write<uint64_t>(value); }
+void
+BinarySerializer::WriteValue(uint64_t value) {
+  Write<uint64_t>(value);
+}
 
-void BinarySerializer::WriteValue(int8_t value) { Write<int8_t>(value); }
+void
+BinarySerializer::WriteValue(int8_t value) {
+  Write<int8_t>(value);
+}
 
-void BinarySerializer::WriteValue(int16_t value) { Write<int16_t>(value); }
+void
+BinarySerializer::WriteValue(int16_t value) {
+  Write<int16_t>(value);
+}
 
-void BinarySerializer::WriteValue(int32_t value) { Write<int32_t>(value); }
+void
+BinarySerializer::WriteValue(int32_t value) {
+  Write<int32_t>(value);
+}
 
-void BinarySerializer::WriteValue(int64_t value) { Write<int64_t>(value); }
+void
+BinarySerializer::WriteValue(int64_t value) {
+  Write<int64_t>(value);
+}
 
-void BinarySerializer::WriteValue(float value) { Write<float>(value); }
+void
+BinarySerializer::WriteValue(float value) {
+  Write<float>(value);
+}
 
-void BinarySerializer::WriteValue(double value) { Write<double>(value); }
+void
+BinarySerializer::WriteValue(double value) {
+  Write<double>(value);
+}
 
-void BinarySerializer::WriteValue(const char *value) {
+void
+BinarySerializer::WriteValue(const char *value) {
   auto length = strlen(value);
   Write<size_t>(length);
   WriteData(value, length);

@@ -13,18 +13,21 @@
 
 namespace estd {
 
-void Respository::AddNewTimeline() {
-  appender_->Append(LogType::kCreate, dummyLoc, dummyVec);
+void
+Respository::AddNewTimeline() {
+  appender_->Append(LogType::kDummy, dummyLoc, dummyVec);
 }
 
-auto Respository::Verify(const LogRecord &action) -> bool {
-  return action.type == LogType::kCreate && action.data == dummyVec &&
+auto
+Respository::Verify(const LogRecord &action) -> bool {
+  return action.type == LogType::kDummy && action.data == dummyVec &&
          action.location == dummyLoc;
 }
 
-void Respository::Accept(LogRecord &action) {
+void
+Respository::Accept(LogRecord &action) {
   if (!Verify(action)) {
-    throw std::invalid_argument("invalid action fot Respository");
+    throw std::invalid_argument("invalid action for Respository");
   }
   timeline_ = std::make_unique<Timeline>(*appender_);
 }

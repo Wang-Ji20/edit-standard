@@ -8,10 +8,12 @@
 //===------------------------------------------===
 
 #include "serializer/json_serializer.hh"
+#include <stdexcept>
 
 namespace estd {
 
-void JsonSerializer::PushValue(yyjson_mut_val *val) {
+void
+JsonSerializer::PushValue(yyjson_mut_val *val) {
   auto *current = GetCurrent();
   if (yyjson_mut_is_arr(current)) {
     yyjson_mut_arr_append(current, val);
@@ -25,7 +27,8 @@ void JsonSerializer::PushValue(yyjson_mut_val *val) {
 }
 
 /// tag: the key of the value
-void JsonSerializer::SetTag(const char *tag) {
+void
+JsonSerializer::SetTag(const char *tag) {
   current_tag = yyjson_mut_strcpy(doc, tag);
 }
 
@@ -33,13 +36,15 @@ void JsonSerializer::SetTag(const char *tag) {
 // Nested types
 //===------------------------------------------------===
 
-void JsonSerializer::OnObjectBegin() {
+void
+JsonSerializer::OnObjectBegin() {
   auto *newValue = yyjson_mut_obj(doc);
   PushValue(newValue);
   stack.push_back(newValue);
 }
 
-void JsonSerializer::PruneEmptyObject(yyjson_mut_val *obj) {
+void
+JsonSerializer::PruneEmptyObject(yyjson_mut_val *obj) {
   auto *parent = GetCurrent();
 
   // parent is array, remove obj
@@ -74,7 +79,8 @@ void JsonSerializer::PruneEmptyObject(yyjson_mut_val *obj) {
   yyjson_mut_obj_remove_key(parent, found);
 }
 
-void JsonSerializer::OnObjectEnd() {
+void
+JsonSerializer::OnObjectEnd() {
   auto *obj = GetCurrent();
   auto count = yyjson_mut_obj_size(obj);
   stack.pop_back();
@@ -83,19 +89,30 @@ void JsonSerializer::OnObjectEnd() {
   }
 }
 
-void JsonSerializer::OnPairBegin() {
+void
+JsonSerializer::OnPairBegin() {
   auto *newValue = yyjson_mut_obj(doc);
   PushValue(newValue);
   stack.push_back(newValue);
 }
 
-void JsonSerializer::OnPairEnd() { stack.pop_back(); }
+void
+JsonSerializer::OnPairEnd() {
+  stack.pop_back();
+}
 
-void JsonSerializer::OnPairKeyBegin() { SetTag("key"); }
+void
+JsonSerializer::OnPairKeyBegin() {
+  SetTag("key");
+}
 
-void JsonSerializer::OnPairValueBegin() { SetTag("value"); }
+void
+JsonSerializer::OnPairValueBegin() {
+  SetTag("value");
+}
 
-void JsonSerializer::OnVectorBegin(size_t size) {
+void
+JsonSerializer::OnVectorBegin(size_t size) {
   auto *newValue = yyjson_mut_arr(doc);
   if (size != 0ULL || !skipEmpty_) {
     PushValue(newValue);
@@ -103,9 +120,13 @@ void JsonSerializer::OnVectorBegin(size_t size) {
   stack.push_back(newValue);
 }
 
-void JsonSerializer::OnVectorEnd(size_t size) { stack.pop_back(); }
+void
+JsonSerializer::OnVectorEnd(size_t size) {
+  stack.pop_back();
+}
 
-void JsonSerializer::OnUnorderedMapBegin(size_t size) {
+void
+JsonSerializer::OnUnorderedMapBegin(size_t size) {
   auto *newValue = yyjson_mut_arr(doc);
   if (size != 0ULL || !skipEmpty_) {
     PushValue(newValue);
@@ -113,85 +134,111 @@ void JsonSerializer::OnUnorderedMapBegin(size_t size) {
   stack.push_back(newValue);
 }
 
-void JsonSerializer::OnUnorderedMapEnd(size_t size) { stack.pop_back(); }
+void
+JsonSerializer::OnUnorderedMapEnd(size_t size) {
+  stack.pop_back();
+}
 
-void JsonSerializer::OnUnorderedMapItemBegin() {
+void
+JsonSerializer::OnUnorderedMapItemBegin() {
   auto *newValue = yyjson_mut_obj(doc);
   PushValue(newValue);
   stack.push_back(newValue);
 }
 
-void JsonSerializer::OnUnorderedMapItemEnd() { stack.pop_back(); }
+void
+JsonSerializer::OnUnorderedMapItemEnd() {
+  stack.pop_back();
+}
 
-void JsonSerializer::OnUnorderedMapKeyBegin() { SetTag("key"); }
+void
+JsonSerializer::OnUnorderedMapKeyBegin() {
+  SetTag("key");
+}
 
-void JsonSerializer::OnUnorderedMapValueBegin() { SetTag("value"); }
+void
+JsonSerializer::OnUnorderedMapValueBegin() {
+  SetTag("value");
+}
 
 //===------------------------------------------------===
 // primitive types
 //===------------------------------------------------===
 
-void JsonSerializer::WriteNull() {
+void
+JsonSerializer::WriteNull() {
   auto *val = yyjson_mut_null(doc);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(bool value) {
+void
+JsonSerializer::WriteValue(bool value) {
   auto *val = yyjson_mut_bool(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(int8_t value) {
+void
+JsonSerializer::WriteValue(int8_t value) {
   auto *val = yyjson_mut_sint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(uint8_t value) {
+void
+JsonSerializer::WriteValue(uint8_t value) {
   auto *val = yyjson_mut_uint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(int16_t value) {
+void
+JsonSerializer::WriteValue(int16_t value) {
   auto *val = yyjson_mut_sint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(uint16_t value) {
+void
+JsonSerializer::WriteValue(uint16_t value) {
   auto *val = yyjson_mut_uint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(int32_t value) {
+void
+JsonSerializer::WriteValue(int32_t value) {
   auto *val = yyjson_mut_sint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(uint32_t value) {
+void
+JsonSerializer::WriteValue(uint32_t value) {
   auto *val = yyjson_mut_uint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(int64_t value) {
+void
+JsonSerializer::WriteValue(int64_t value) {
   auto *val = yyjson_mut_sint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(uint64_t value) {
+void
+JsonSerializer::WriteValue(uint64_t value) {
   auto *val = yyjson_mut_uint(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(float value) {
+void
+JsonSerializer::WriteValue(float value) {
   auto *val = yyjson_mut_real(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(double value) {
+void
+JsonSerializer::WriteValue(double value) {
   auto *val = yyjson_mut_real(doc, value);
   PushValue(val);
 }
 
-void JsonSerializer::WriteValue(const char *value) {
+void
+JsonSerializer::WriteValue(const char *value) {
   if (skipEmpty_ && strlen(value) == 0) {
     return;
   }

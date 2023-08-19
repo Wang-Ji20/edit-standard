@@ -24,11 +24,13 @@ struct HashingConstants {
 /// for example checksum, hash, etc.
 struct HashingUtilities {
 
-  static auto Checksum(const uint64_t data) -> uint64_t {
+  static auto
+  Checksum(const uint64_t data) -> uint64_t {
     return data * HashingConstants::kMagicOne;
   }
 
-  static auto Checksum(const uint8_t *data, size_t size) -> uint64_t {
+  static auto
+  Checksum(const uint8_t *data, size_t size) -> uint64_t {
     uint64_t inEightBytes = size / sizeof(uint64_t);
     auto *data64 = reinterpret_cast<const uint64_t *>(data);
     uint64_t checksum = 0;
@@ -40,7 +42,6 @@ struct HashingUtilities {
     }
     return checksum;
   }
-
 };
 
 } // namespace estd

@@ -11,7 +11,8 @@
 
 namespace estd {
 
-auto JsonDeserializer::GetNextValue() -> yyjson_val * {
+auto
+JsonDeserializer::GetNextValue() -> yyjson_val * {
   auto &current = GetCurrent();
   // current is either an array or an object
   yyjson_val *val = nullptr;
@@ -43,32 +44,36 @@ auto JsonDeserializer::GetNextValue() -> yyjson_val * {
   return val;
 }
 
-void JsonDeserializer::DumpDoc() {
+void
+JsonDeserializer::DumpDoc() {
   const char *json = yyjson_write(doc, 0, nullptr);
   fprintf(stderr, "%s\n", json);
   free((void *)json);
 }
 
-void JsonDeserializer::DumpCurrent() {
+void
+JsonDeserializer::DumpCurrent() {
   const char *json = yyjson_val_write(GetCurrent().val, 0, nullptr);
   fprintf(stderr, "%s\n", json);
   free((void *)json);
 }
 
-void JsonDeserializer::Dump(yyjson_mut_val *val) {
+void
+JsonDeserializer::Dump(yyjson_mut_val *val) {
   const char *json = yyjson_mut_val_write(val, 0, nullptr);
   fprintf(stderr, "%s\n", json);
   free((void *)json);
 }
 
-void JsonDeserializer::Dump(yyjson_val *val) {
+void
+JsonDeserializer::Dump(yyjson_val *val) {
   const char *json = yyjson_val_write(val, 0, nullptr);
   fprintf(stderr, "%s\n", json);
   free((void *)json);
 }
 
-[[noreturn]] void JsonDeserializer::ThrowTypeError(yyjson_val *val,
-                                                   const char *expected) {
+[[noreturn]] void
+JsonDeserializer::ThrowTypeError(yyjson_val *val, const char *expected) {
   const auto *actual = yyjson_get_type_desc(val);
   auto &parent = GetCurrent();
   if (yyjson_is_obj(parent.val)) {
@@ -86,7 +91,8 @@ void JsonDeserializer::Dump(yyjson_val *val) {
 // override hooks
 //===------------------------------------------------------------------------===
 
-auto JsonDeserializer::OnVectorBegin() -> size_t {
+auto
+JsonDeserializer::OnVectorBegin() -> size_t {
   auto *val = GetNextValue();
   if (!yyjson_is_arr(val)) {
     ThrowTypeError(val, "array");
@@ -95,9 +101,13 @@ auto JsonDeserializer::OnVectorBegin() -> size_t {
   return yyjson_arr_size(val);
 }
 
-void JsonDeserializer::OnVectorEnd() { Pop(); }
+void
+JsonDeserializer::OnVectorEnd() {
+  Pop();
+}
 
-auto JsonDeserializer::OnMapBegin() -> size_t {
+auto
+JsonDeserializer::OnMapBegin() -> size_t {
   auto *val = GetNextValue();
   if (!yyjson_is_obj(val)) {
     ThrowTypeError(val, "array");
@@ -106,9 +116,13 @@ auto JsonDeserializer::OnMapBegin() -> size_t {
   return yyjson_obj_size(val);
 }
 
-void JsonDeserializer::OnMapEnd() { Pop(); }
+void
+JsonDeserializer::OnMapEnd() {
+  Pop();
+}
 
-void JsonDeserializer::OnMapEntryBegin() {
+void
+JsonDeserializer::OnMapEntryBegin() {
   auto *val = GetNextValue();
   if (!yyjson_is_obj(val)) {
     ThrowTypeError(val, "object");
@@ -116,13 +130,23 @@ void JsonDeserializer::OnMapEntryBegin() {
   Push(val);
 }
 
-void JsonDeserializer::OnMapEntryEnd() { Pop(); }
+void
+JsonDeserializer::OnMapEntryEnd() {
+  Pop();
+}
 
-void JsonDeserializer::OnMapKeyBegin() { SetTag("key"); }
+void
+JsonDeserializer::OnMapKeyBegin() {
+  SetTag("key");
+}
 
-void JsonDeserializer::OnMapValueBegin() { SetTag("value"); }
+void
+JsonDeserializer::OnMapValueBegin() {
+  SetTag("value");
+}
 
-void JsonDeserializer::OnObjectBegin() {
+void
+JsonDeserializer::OnObjectBegin() {
   auto *val = GetNextValue();
   if (!yyjson_is_obj(val)) {
     ThrowTypeError(val, "object");
@@ -130,9 +154,13 @@ void JsonDeserializer::OnObjectBegin() {
   Push(val);
 }
 
-void JsonDeserializer::OnObjectEnd() { Pop(); }
+void
+JsonDeserializer::OnObjectEnd() {
+  Pop();
+}
 
-void JsonDeserializer::OnPairBegin() {
+void
+JsonDeserializer::OnPairBegin() {
   auto *val = GetNextValue();
   if (!yyjson_is_obj(val)) {
     ThrowTypeError(val, "object");
@@ -140,17 +168,27 @@ void JsonDeserializer::OnPairBegin() {
   Push(val);
 }
 
-void JsonDeserializer::OnPairKeyBegin() { SetTag("key"); }
+void
+JsonDeserializer::OnPairKeyBegin() {
+  SetTag("key");
+}
 
-void JsonDeserializer::OnPairValueBegin() { SetTag("value"); }
+void
+JsonDeserializer::OnPairValueBegin() {
+  SetTag("value");
+}
 
-void JsonDeserializer::OnPairEnd() { Pop(); }
+void
+JsonDeserializer::OnPairEnd() {
+  Pop();
+}
 
 //===------------------------------------------------------------------------===
 // Primitive types
 //===------------------------------------------------------------------------===
 
-auto JsonDeserializer::ReadBool() -> bool {
+auto
+JsonDeserializer::ReadBool() -> bool {
   auto *val = GetNextValue();
   if (!yyjson_is_bool(val)) {
     ThrowTypeError(val, "bool");
@@ -158,7 +196,8 @@ auto JsonDeserializer::ReadBool() -> bool {
   return yyjson_get_bool(val);
 }
 
-auto JsonDeserializer::ReadSignedInt8() -> int8_t {
+auto
+JsonDeserializer::ReadSignedInt8() -> int8_t {
   auto *val = GetNextValue();
   if (!yyjson_is_int(val)) {
     ThrowTypeError(val, "int");
@@ -166,7 +205,8 @@ auto JsonDeserializer::ReadSignedInt8() -> int8_t {
   return static_cast<int8_t>(yyjson_get_sint(val));
 }
 
-auto JsonDeserializer::ReadUnsignedInt8() -> uint8_t {
+auto
+JsonDeserializer::ReadUnsignedInt8() -> uint8_t {
   auto *val = GetNextValue();
   if (!yyjson_is_uint(val)) {
     ThrowTypeError(val, "uint");
@@ -174,7 +214,8 @@ auto JsonDeserializer::ReadUnsignedInt8() -> uint8_t {
   return static_cast<uint8_t>(yyjson_get_uint(val));
 }
 
-auto JsonDeserializer::ReadSignedInt16() -> int16_t {
+auto
+JsonDeserializer::ReadSignedInt16() -> int16_t {
   auto *val = GetNextValue();
   if (!yyjson_is_int(val)) {
     ThrowTypeError(val, "int");
@@ -182,7 +223,8 @@ auto JsonDeserializer::ReadSignedInt16() -> int16_t {
   return static_cast<int16_t>(yyjson_get_sint(val));
 }
 
-auto JsonDeserializer::ReadUnsignedInt16() -> uint16_t {
+auto
+JsonDeserializer::ReadUnsignedInt16() -> uint16_t {
   auto *val = GetNextValue();
   if (!yyjson_is_uint(val)) {
     ThrowTypeError(val, "uint");
@@ -190,7 +232,8 @@ auto JsonDeserializer::ReadUnsignedInt16() -> uint16_t {
   return static_cast<uint16_t>(yyjson_get_uint(val));
 }
 
-auto JsonDeserializer::ReadSignedInt32() -> int32_t {
+auto
+JsonDeserializer::ReadSignedInt32() -> int32_t {
   auto *val = GetNextValue();
   if (!yyjson_is_int(val)) {
     ThrowTypeError(val, "int");
@@ -198,7 +241,8 @@ auto JsonDeserializer::ReadSignedInt32() -> int32_t {
   return static_cast<int32_t>(yyjson_get_sint(val));
 }
 
-auto JsonDeserializer::ReadUnsignedInt32() -> uint32_t {
+auto
+JsonDeserializer::ReadUnsignedInt32() -> uint32_t {
   auto *val = GetNextValue();
   if (!yyjson_is_uint(val)) {
     ThrowTypeError(val, "uint");
@@ -206,7 +250,8 @@ auto JsonDeserializer::ReadUnsignedInt32() -> uint32_t {
   return static_cast<uint32_t>(yyjson_get_uint(val));
 }
 
-auto JsonDeserializer::ReadSignedInt64() -> int64_t {
+auto
+JsonDeserializer::ReadSignedInt64() -> int64_t {
   auto *val = GetNextValue();
   if (!yyjson_is_int(val)) {
     ThrowTypeError(val, "int");
@@ -214,7 +259,8 @@ auto JsonDeserializer::ReadSignedInt64() -> int64_t {
   return static_cast<int64_t>(yyjson_get_sint(val));
 }
 
-auto JsonDeserializer::ReadUnsignedInt64() -> uint64_t {
+auto
+JsonDeserializer::ReadUnsignedInt64() -> uint64_t {
   auto *val = GetNextValue();
   if (!yyjson_is_uint(val)) {
     ThrowTypeError(val, "uint");
@@ -222,7 +268,8 @@ auto JsonDeserializer::ReadUnsignedInt64() -> uint64_t {
   return static_cast<uint64_t>(yyjson_get_uint(val));
 }
 
-auto JsonDeserializer::ReadFloat() -> float {
+auto
+JsonDeserializer::ReadFloat() -> float {
   auto *val = GetNextValue();
   if (!yyjson_is_real(val)) {
     ThrowTypeError(val, "float");
@@ -230,7 +277,8 @@ auto JsonDeserializer::ReadFloat() -> float {
   return static_cast<float>(yyjson_get_real(val));
 }
 
-auto JsonDeserializer::ReadDouble() -> double {
+auto
+JsonDeserializer::ReadDouble() -> double {
   auto *val = GetNextValue();
   if (!yyjson_is_real(val)) {
     ThrowTypeError(val, "double");
@@ -238,7 +286,8 @@ auto JsonDeserializer::ReadDouble() -> double {
   return yyjson_get_real(val);
 }
 
-auto JsonDeserializer::ReadString() -> string {
+auto
+JsonDeserializer::ReadString() -> string {
   auto *val = GetNextValue();
   if (!yyjson_is_str(val)) {
     ThrowTypeError(val, "string");

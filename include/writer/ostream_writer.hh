@@ -19,14 +19,16 @@ public:
   OStreamWriter(std::ostream &os, SerializerPrototype ser)
       : Writer(std::move(ser)), os_(os) {}
 
-  auto OnChecksumHook(uint64_t checksum) -> void override {
+  auto
+  OnChecksumHook(uint64_t checksum) -> void override {
     Writer::WriteInternal(checksum, WriteMode::Raw, ChecksumMode::NoChecksum);
   }
 
   ~OStreamWriter() override = default;
 
 protected:
-  auto WriteRaw(const uint8_t *begin, const uint8_t *end) -> void override {
+  auto
+  WriteRaw(const uint8_t *begin, const uint8_t *end) -> void override {
     std::copy(begin, end, std::ostream_iterator<uint8_t>(os_));
   }
 

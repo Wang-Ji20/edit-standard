@@ -21,30 +21,39 @@ namespace estd {
 
 class OTIOTracker {
 public:
-  [[nodiscard]] static auto NewTrackerFromRoot(AbstractModel *as) -> OTIOTracker {
+  [[nodiscard]] static auto
+  NewTrackerFromRoot(AbstractModel &as) -> OTIOTracker {
     return OTIOTracker(as);
   }
 
-  [[nodiscard]] auto GetLocation() const -> const OtioLocation & {
+  [[nodiscard]] auto
+  GetLocation() const -> const OtioLocation & {
     return location_;
   }
 
-  [[nodiscard]] auto ArraySub(size_t idx, OTIOType ty) -> OTIOTracker {
-    return {*this, "[" + std::to_string(idx) + "]", ty};
+  [[nodiscard]] auto
+  ArraySub(size_t idx, OTIOType ty, AbstractModel &as) -> OTIOTracker {
+    return {*this, "[" + std::to_string(idx) + "]", ty, as};
   }
 
-  [[nodiscard]] auto DictSub(std::string idx, OTIOType ty) -> OTIOTracker {
-    return {*this, "[" + idx + "]", ty};
+  [[nodiscard]] auto
+  DictSub(std::string idx, OTIOType ty, AbstractModel &as) -> OTIOTracker {
+    return {*this, "[" + idx + "]", ty, as};
   }
 
-  [[nodiscard]] auto FieldRef(std::string field, OTIOType ty) -> OTIOTracker {
-    return {*this, "." + field, ty};
+  [[nodiscard]] auto
+  FieldRef(std::string field, OTIOType ty, AbstractModel &as) -> OTIOTracker {
+    return {*this, "." + field, ty, as};
   }
 
 private:
-  explicit OTIOTracker(AbstractModel *as) : location_("$", OTIOType::kTimeline, as) {}
-  OTIOTracker(const OTIOTracker &parent, std::string child, OTIOType childTy)
-      : location_(parent.location_.rawLocation + child, childTy) {}
+  explicit OTIOTracker(AbstractModel &as)
+      : location_("$", OTIOType::kTimeline, as) {}
+  OTIOTracker(const OTIOTracker &parent,
+              std::string child,
+              OTIOType childTy,
+              AbstractModel &as)
+      : location_(parent.location_.rawLocation + child, childTy, as) {}
 
   OtioLocation location_;
 };

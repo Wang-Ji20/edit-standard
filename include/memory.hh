@@ -17,15 +17,22 @@ namespace estd {
 
 struct MemoryUtils {
 
-  template <typename T> static auto Store(T *ptr, const T &value) -> void {
-    *ptr = value;
+  template <typename T>
+  static auto
+  Store(uint8_t *ptr, const T &value) -> void {
+    T *p = reinterpret_cast<T *>(ptr);
+    *p = value;
   }
 
-  template <typename T> static auto Load(const uint8_t *ptr) -> T {
+  template <typename T>
+  static auto
+  Load(const uint8_t *ptr) -> T {
     return Load<T>(ptr, 0ULL);
   }
 
-  template <typename T> static auto Load(const uint8_t *ptr, size_t offset) -> T {
+  template <typename T>
+  static auto
+  Load(const uint8_t *ptr, size_t offset) -> T {
     return *reinterpret_cast<const T *>(ptr + offset);
   }
 };

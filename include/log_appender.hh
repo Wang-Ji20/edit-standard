@@ -28,14 +28,18 @@ public:
 
   LogAppender(uint64_t seed, Writer &writer) : seed_(seed), writer_(writer) {}
 
-  void Append(LogType type,
-              const OtioLocation &location,
-              std::vector<uint8_t> &data) {
+  void
+  Append(LogType type,
+         const OtioLocation &location,
+         std::vector<uint8_t> &data) {
     LogID id(seed_, counter_++);
     LogRecord record{id, location, type, data};
-    // TODO: Refactor, only object can be accepted.
-    // there is a workaround for test case now.
-    location.object ? location.object->Accept(record) : (void)0;
+    Append(std::move(record));
+  }
+
+  void
+  Append(LogRecord &&record) {
+    record.location.object.Accept(record);
     writer_.Write(record);
   }
 

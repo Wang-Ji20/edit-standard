@@ -26,11 +26,13 @@ using std::vector;
 ///    2. The next are elements in the container
 class BinarySerializer : public Serializer {
 public:
-  auto Serialize() -> std::vector<uint8_t> override {
+  auto
+  Serialize() -> std::vector<uint8_t> override {
     return {data.begin(), data.end()};
   }
-  
-  void Clear() override {
+
+  void
+  Clear() override {
     data.clear();
     stack.clear();
     stack.emplace_back(0, 0, 0);
@@ -46,7 +48,8 @@ private:
     size_t objectSize;
     size_t bufferOffset;
     State(uint32_t fieldCount, size_t objectSize, size_t bufferOffset)
-        : fieldCount(fieldCount), objectSize(objectSize),
+        : fieldCount(fieldCount),
+          objectSize(objectSize),
           bufferOffset(bufferOffset) {}
   };
 
@@ -56,17 +59,22 @@ private:
 
   vector<State> stack;
 
-  template <typename T> void Store(const T &value, char *buffer) {
+  template <typename T>
+  void
+  Store(const T &value, char *buffer) {
     std::memcpy(buffer, (void *)&value, sizeof(T));
   }
 
-  template <typename T> void Write(T value) {
+  template <typename T>
+  void
+  Write(T value) {
     static_assert(std::is_trivially_destructible<T>::value,
                   "T must be trivally destructible-typed variable");
     WriteData(reinterpret_cast<const char *>(&value), sizeof(T));
   }
 
-  void WriteData(const char *buffer, size_t size) {
+  void
+  WriteData(const char *buffer, size_t size) {
     data.insert(data.end(), buffer, buffer + size);
     stack.back().objectSize += size;
   }
@@ -77,15 +85,17 @@ private:
   // parent interface
   //===------------------------------------------------------------------------===
 public:
-  template <typename T> static auto Serialize(T &obj) -> vector<char> {
+  template <typename T>
+  static auto
+  Serialize(T &obj) -> vector<char> {
     BinarySerializer serializer;
     serializer.WriteValue(obj);
     return std::move(serializer.data);
   }
 
   template <typename T>
-  static auto Serialize(const T &obj, char *buffer, size_t bufferSize)
-      -> size_t {
+  static auto
+  Serialize(const T &obj, char *buffer, size_t bufferSize) -> size_t {
     BinarySerializer serializer;
     serializer.WriteValue(obj);
     auto size = serializer.data.size();
@@ -96,36 +106,54 @@ public:
     return size;
   }
 
-  void SetTag(const char *tag) override;
+  void
+  SetTag(const char *tag) override;
 
-  void OnObjectBegin() final;
-  void OnObjectEnd() final;
+  void
+  OnObjectBegin() final;
+  void
+  OnObjectEnd() final;
 
   //===------------------------------------------------===
   // write a vector
   //===------------------------------------------------===
-  void OnVectorBegin(size_t size) final;
+  void
+  OnVectorBegin(size_t size) final;
 
   //===------------------------------------------------===
   // write an unordered map
   //===------------------------------------------------===
-  void OnUnorderedMapBegin(size_t size) final;
+  void
+  OnUnorderedMapBegin(size_t size) final;
 
   // https://stackoverflow.com/questions/3678197/virtual-function-implemented-in-base-class-not-being-found-by-compiler
   using Serializer::WriteValue;
-  void WriteValue(const char *value) final;
-  void WriteNull() final;
-  void WriteValue(bool value) final;
-  void WriteValue(uint8_t value) final;
-  void WriteValue(int8_t value) final;
-  void WriteValue(uint16_t value) final;
-  void WriteValue(int16_t value) final;
-  void WriteValue(uint32_t value) final;
-  void WriteValue(int32_t value) final;
-  void WriteValue(uint64_t value) final;
-  void WriteValue(int64_t value) final;
-  void WriteValue(float value) final;
-  void WriteValue(double value) final;
+  void
+  WriteValue(const char *value) final;
+  void
+  WriteNull() final;
+  void
+  WriteValue(bool value) final;
+  void
+  WriteValue(uint8_t value) final;
+  void
+  WriteValue(int8_t value) final;
+  void
+  WriteValue(uint16_t value) final;
+  void
+  WriteValue(int16_t value) final;
+  void
+  WriteValue(uint32_t value) final;
+  void
+  WriteValue(int32_t value) final;
+  void
+  WriteValue(uint64_t value) final;
+  void
+  WriteValue(int64_t value) final;
+  void
+  WriteValue(float value) final;
+  void
+  WriteValue(double value) final;
 };
 
 } // namespace estd

@@ -18,7 +18,8 @@ class AbstractModel {
 public:
   virtual ~AbstractModel() = default;
 
-  virtual void Accept(LogRecord &action) = 0;
+  virtual void
+  Accept(LogRecord &action) = 0;
 };
 
 } // namespace estd

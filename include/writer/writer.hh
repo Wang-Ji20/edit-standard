@@ -32,19 +32,27 @@ public:
   virtual ~Writer() = default;
 
   // most of the time client should use this.
-  template <typename T> auto Write(const T &t) -> void { WriteInternal(t); }
+  template <typename T>
+  auto
+  Write(const T &t) -> void {
+    WriteInternal(t);
+  }
 
 protected:
-  virtual auto OnChecksumHook(uint64_t checksum) -> void = 0;
-  virtual auto WriteRaw(const uint8_t *begin, const uint8_t *end) -> void = 0;
+  virtual auto
+  OnChecksumHook(uint64_t checksum) -> void = 0;
+  virtual auto
+  WriteRaw(const uint8_t *begin, const uint8_t *end) -> void = 0;
 
   enum class WriteMode { Serialize, Raw };
   enum class ChecksumMode { Checksum, NoChecksum };
 
   // this function acts as a dispatcher. syntax sugar, maybe a bad idea really.
   template <typename T>
-  auto WriteInternal(const T &t, WriteMode serialize = WriteMode::Serialize,
-                     ChecksumMode checksum = ChecksumMode::Checksum) -> void {
+  auto
+  WriteInternal(const T &t,
+                WriteMode serialize = WriteMode::Serialize,
+                ChecksumMode checksum = ChecksumMode::Checksum) -> void {
     auto begin = reinterpret_cast<const uint8_t *>(&t);
     auto end = reinterpret_cast<const uint8_t *>(&t + 1);
     if (checksum == ChecksumMode::Checksum) {
@@ -60,7 +68,9 @@ protected:
   SerializerPrototype prototype_ = []() { return nullptr; };
 
 private:
-  template <typename T> auto WriteSerialized(const T &t) -> void {
+  template <typename T>
+  auto
+  WriteSerialized(const T &t) -> void {
     auto serializer = prototype_();
     if (!serializer) {
       throw std::runtime_error("Serializer prototype is not set.");
@@ -71,7 +81,8 @@ private:
     return;
   }
 
-  auto Checksum(const uint8_t *begin, const uint8_t *end) -> void {
+  auto
+  Checksum(const uint8_t *begin, const uint8_t *end) -> void {
     auto checksum = HashingUtilities::Checksum(begin, end - begin);
     OnChecksumHook(checksum);
   }

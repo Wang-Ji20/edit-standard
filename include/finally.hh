@@ -27,10 +27,12 @@ public:
 
   // disallow copy, allow move (extend lifetime)
   FinalAction(const FinalAction &) = delete;
-  auto operator=(const FinalAction &) -> FinalAction & = delete;
+  auto
+  operator=(const FinalAction &) -> FinalAction & = delete;
 
   FinalAction(FinalAction &&) = default;
-  auto operator=(FinalAction &&) -> FinalAction & = default;
+  auto
+  operator=(FinalAction &&) -> FinalAction & = default;
 
 private:
   // To avoid unnamed temporary object.

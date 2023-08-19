@@ -8,8 +8,9 @@
 //===------------------------------------------===
 
 #include "log_appender.hh"
-#include "writer/ostream_writer.hh"
+#include "model/respository.hh"
 #include "serializer/json_serializer.hh"
+#include "writer/ostream_writer.hh"
 
 #include "gtest/gtest.h"
 
@@ -23,8 +24,11 @@ TEST(LogAppenderSuite, AppendTest) {
   OStreamWriter writer(cerr, JSONSerializerFactory);
   LogAppender appender(writer);
 
-  vector<uint8_t> data{1, 2, 3, 4, 5};
-  OtioLocation location{"$", OTIOType::kTimeline};
-  appender.Append(LogType::kCreate, location, data);
-  appender.Append(LogType::kModify, location, data);
+  Respository repo(writer);
+  OtioLocation mockdummyLoc{"$", OTIOType::kDummy, repo};
+  vector<uint8_t> mockdummydata;
+
+  appender.Append(LogType::kDummy, mockdummyLoc, mockdummydata);
+  EXPECT_ANY_THROW(
+      appender.Append(LogType::kModify, mockdummyLoc, mockdummydata));
 }

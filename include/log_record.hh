@@ -28,6 +28,8 @@ namespace estd {
 namespace otio = opentimelineio::OPENTIMELINEIO_VERSION;
 
 enum class OTIOType : uint8_t {
+  kInvalid = 0,
+  kDummy,
   kTimeline,
   kStack,
   kTrack,
@@ -39,17 +41,21 @@ enum class OTIOType : uint8_t {
 };
 
 struct OtioLocation {
-  OtioLocation(std::string rawLocation, OTIOType objectTy, AbstractModel *aobject = nullptr)
+  OtioLocation(std::string rawLocation,
+               OTIOType objectTy,
+               AbstractModel &aobject)
       : objectTy(objectTy), object(aobject) {
     Validate(rawLocation);
     this->rawLocation = std::move(rawLocation);
   }
 
-  auto operator== (const OtioLocation &other) const -> bool {
+  auto
+  operator==(const OtioLocation &other) const -> bool {
     return rawLocation == other.rawLocation;
   }
 
-  static void Validate(const std::string &rawLocation) {
+  static void
+  Validate(const std::string &rawLocation) {
     if (rawLocation.empty()) {
       throw std::invalid_argument("empty location");
     }
@@ -60,17 +66,20 @@ struct OtioLocation {
   }
 
   template <typename Ser>
-  friend void estdWriteValue(Ser &serializer, const OtioLocation &value) {
+  friend void
+  estdWriteValue(Ser &serializer, const OtioLocation &value) {
     serializer.WriteValue(value.rawLocation);
   }
 
   // use $[trackName][][][].property to refer an OTIO object
   std::string rawLocation;
   OTIOType objectTy;
-  AbstractModel *object; // TODO: change to reference
+  AbstractModel &object;
 };
 
 enum class LogType : uint8_t {
+  kInvalid = 0,
+  kDummy,
   kCreate, // object type + object serialized data
   kModify, // field name + field value
   kDelete, // object type
@@ -84,18 +93,29 @@ struct LogID {
     std::memcpy(id_.data() + sizeof(uint64_t), &order, sizeof(uint64_t));
   }
 
-  auto Data() -> uint8_t * { return id_.data(); }
-  auto operator==(const LogID &other) const -> bool { return id_ == other.id_; }
+  auto
+  Data() -> uint8_t * {
+    return id_.data();
+  }
+  auto
+  operator==(const LogID &other) const -> bool {
+    return id_ == other.id_;
+  }
 
-  auto operator>(const LogID &other) const -> bool { return id_ > other.id_; }
+  auto
+  operator>(const LogID &other) const -> bool {
+    return id_ > other.id_;
+  }
 
-  [[nodiscard]] auto Order() const -> uint64_t {
+  [[nodiscard]] auto
+  Order() const -> uint64_t {
     auto order = MemoryUtils::Load<uint64_t>(id_.data(), sizeof(uint64_t));
     return order;
   }
 
   template <typename Ser>
-  friend void estdWriteValue(Ser &serializer, const LogID &value) {
+  friend void
+  estdWriteValue(Ser &serializer, const LogID &value) {
     serializer.OnVectorBegin(16);
     for (auto c : value.id_) {
       serializer.WriteValue(c);
@@ -113,7 +133,8 @@ struct LogRecord {
   std::vector<uint8_t> data;
 
   template <typename Ser>
-  friend void estdWriteValue(Ser &serializer, const LogRecord &value) {
+  friend void
+  estdWriteValue(Ser &serializer, const LogRecord &value) {
     serializer.OnObjectBegin();
     serializer.WriteProperty("id", value.id);
     serializer.WriteProperty("location", value.location);

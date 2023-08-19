@@ -5,6 +5,7 @@ set(
     ${ALL_OBJECT_FILES}
     log_record.cc
     respository.cc
+    timeline.cc
 )
 
 add_library(

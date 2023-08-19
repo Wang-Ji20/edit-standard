@@ -16,7 +16,8 @@ namespace estd {
 class BinaryDeserializer : public Deserializer {
 public:
   template <typename T>
-  static auto Deserialize(char *ptr, size_t length) -> unique_ptr<T> {
+  static auto
+  Deserialize(char *ptr, size_t length) -> unique_ptr<T> {
     BinaryDeserializer deserializer(ptr, length);
     auto result = deserializer.Read<T>();
     return make_unique<T>(std::move(result));
@@ -40,7 +41,9 @@ private:
   char *endPtr_;
   vector<State> stack;
 
-  template <typename T> auto ReadPOD() -> T {
+  template <typename T>
+  auto
+  ReadPOD() -> T {
     static_assert(std::is_trivially_destructible<T>::value,
                   "T must be trivally destructible-typed variable");
     T value;
@@ -48,7 +51,8 @@ private:
     return value;
   }
 
-  void ReadData(char *buffer, size_t read_size) {
+  void
+  ReadData(char *buffer, size_t read_size) {
     if (ptr_ + read_size > endPtr_) {
       throw ParseException("Failed to deserialize: not enough data in buffer "
                            "to fulfill read request");
@@ -57,7 +61,8 @@ private:
     ptr_ += read_size;
   }
 
-  void ReadData(vector<char> &data, size_t read_size) {
+  void
+  ReadData(vector<char> &data, size_t read_size) {
     if (ptr_ + read_size > endPtr_) {
       throw ParseException("Failed to deserialize: not enough data in buffer "
                            "to fulfill read request");
@@ -70,25 +75,42 @@ public:
   //===------------------------------------------------------------------------===
   // override functions
   //===------------------------------------------------------------------------===
-  void SetTag(const char *tag) override;
-  auto OnVectorBegin() -> size_t override;
-  auto OnMapBegin() -> size_t override;
-  void OnObjectBegin() override;
-  void OnObjectEnd() override;
+  void
+  SetTag(const char *tag) override;
+  auto
+  OnVectorBegin() -> size_t override;
+  auto
+  OnMapBegin() -> size_t override;
+  void
+  OnObjectBegin() override;
+  void
+  OnObjectEnd() override;
 
 protected:
-  auto ReadBool() -> bool override;
-  auto ReadSignedInt8() -> int8_t override;
-  auto ReadUnsignedInt8() -> uint8_t override;
-  auto ReadSignedInt16() -> int16_t override;
-  auto ReadUnsignedInt16() -> uint16_t override;
-  auto ReadSignedInt32() -> int32_t override;
-  auto ReadUnsignedInt32() -> uint32_t override;
-  auto ReadSignedInt64() -> int64_t override;
-  auto ReadUnsignedInt64() -> uint64_t override;
-  auto ReadFloat() -> float override;
-  auto ReadDouble() -> double override;
-  auto ReadString() -> string override;
+  auto
+  ReadBool() -> bool override;
+  auto
+  ReadSignedInt8() -> int8_t override;
+  auto
+  ReadUnsignedInt8() -> uint8_t override;
+  auto
+  ReadSignedInt16() -> int16_t override;
+  auto
+  ReadUnsignedInt16() -> uint16_t override;
+  auto
+  ReadSignedInt32() -> int32_t override;
+  auto
+  ReadUnsignedInt32() -> uint32_t override;
+  auto
+  ReadSignedInt64() -> int64_t override;
+  auto
+  ReadUnsignedInt64() -> uint64_t override;
+  auto
+  ReadFloat() -> float override;
+  auto
+  ReadDouble() -> double override;
+  auto
+  ReadString() -> string override;
 };
 
 } // namespace estd

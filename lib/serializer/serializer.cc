@@ -12,6 +12,9 @@
 namespace estd {
 
 /// a vtable anchor
-void Serializer::WriteValue(const string &value) { WriteValue(value.c_str()); }
+void
+Serializer::WriteValue(const string &value) {
+  WriteValue(value.c_str());
+}
 
 } // namespace estd
