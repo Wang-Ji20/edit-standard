@@ -126,6 +126,20 @@ struct LogID {
   std::array<uint8_t, 16> id_;
 };
 
+struct LogRange {
+  LogID begin;
+  LogID end;
+
+  template <typename Ser>
+  friend void
+  estdWriteValue(Ser &serializer, const LogRange &value) {
+    serializer.OnObjectBegin();
+    serializer.WriteProperty("begin", value.begin);
+    serializer.WriteProperty("end", value.end);
+    serializer.OnObjectEnd();
+  }
+};
+
 struct LogRecord {
   LogID id;
   OtioLocation location;
